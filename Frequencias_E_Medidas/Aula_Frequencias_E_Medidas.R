@@ -185,3 +185,237 @@ medias <- tapply(dados$Renda, list(dados$Sexo, dados$Cor), mean)
 rownames(medias) <- c('Masculino', 'Feminino')
 colnames(medias) <- c('Indígena', 'Branca', 'Preta', 'Amarela', 'Parda')
 medias
+
+# ------------------------------------------------------------------------------------------
+
+## DISTRIBUIÇÃO DE FREQUÊNCIAS - PARA VARIÁVEIS QUANTITATIVAS
+# A - Classes personalizadas:
+
+# Classes de Renda:
+# A - Acima de 20 SM
+# B - De 10 a 20 SM
+# C - De 4 a 10 SM
+# D - De 2 a 4 SM
+# E - Até 2 SM
+
+# onde SM é o valor do salário mínimo na época. Em nosso caso R$ 788,00 (2015):
+# A -  Acima de 15.760
+# B -  De 7.880 a 15.760
+# C -  De 3.152 a 7.880
+# D -  De 1.576 a 3.152
+# E -  Até 1.576
+
+min(dados$Renda)
+max(dados$Renda)
+
+classes <- c(0,1576,3152,7880,15760,200000)
+labels <- c('E', 'D', 'C', 'B', 'A')
+
+frequencia <- table(
+    cut(
+        x=dados$Renda,
+        breaks=classes,
+        labels=labels,
+        include.lowest = TRUE
+    )
+)
+frequencia
+
+percentual <- prop.table(frequencia)*100
+percentual
+
+dist_freq_quantitativas_personalizadas <- cbind('Frequência' = frequencia, 'Porcentagem (%)' = percentual)
+dist_freq_quantitativas_personalizadas
+
+# Colocando a tabela na ordem do índice:
+dist_freq_quantitativas_personalizadas[
+    order(row.names(dist_freq_quantitativas_personalizadas)),
+]
+
+# B - Classes de amplitude fixa:
+# Passo 1: Definindo o número de classes - Regra de Sturges
+
+n <- nrow(dados) # Número de linhas (0bservações) na base de dados.
+n
+k <- 1 + (10/3) * log10(n)
+k
+
+k <- round(k) # Função de arredondamento.
+k # Resultado: 17 classes.
+
+# Passo 2: Criar tabela de frequências.
+
+labels <- c(
+    '      0.00 |-|  11,764.70', 
+    ' 11,764.70  -|  23,529.40', 
+    ' 23,529.40  -|  35,294.10', 
+    ' 35,294.10  -|  47,058.80', 
+    ' 47,058.80  -|  58,823.50', 
+    ' 58,823.50  -|  70,588.20', 
+    ' 70,588.20  -|  82,352.90', 
+    ' 82,352.90  -|  94,117.60', 
+    ' 94,117.60  -| 105,882.00', 
+    '105,882.00  -| 117,647.00', 
+    '117,647.00  -| 129,412.00', 
+    '129,412.00  -| 141,176.00', 
+    '141,176.00  -| 152,941.00', 
+    '152,941.00  -| 164,706.00', 
+    '164,706.00  -| 176,471.00', 
+    '176,471.00  -| 188,235.00', 
+    '188,235.00  -| 200,000.00'
+)
+
+frequencia <- table(
+    cut(
+        x=dados$Renda,
+        breaks=k,
+        labels=labels,
+        include.lowest = TRUE
+    )
+)
+frequencia
+
+percentual <- prop.table(frequencia)*100
+percentual
+
+dist_freq_quantitativas_amplitude_fixa <- cbind('Frequência' = frequencia, 'Porcentagem (%)' = percentual)
+dist_freq_quantitativas_amplitude_fixa
+
+# Colocando a tabela na ordem do índice:
+dist_freq_quantitativas_amplitude_fixa[
+    order(row.names(dist_freq_quantitativas_amplitude_fixa)),
+]
+
+# HISTOGRAMA:
+# O HISTOGRAMA é a representação gráfica de uma distribuição de frequências. 
+# É um gráfico formado por um conjunto de retângulos colocados lado a lado, 
+# onde a área de cada retângulo é proporcional à frequência da classe que ele representa.
+
+# options(repr.plot.width = 7, repr.plot.height = 4) # Configurando o tamanho da visualização do histograma
+
+hist(dados$Altura) # Gráfico simples
+
+hist(
+    x = dados$Altura,
+    breaks = 'Sturges',
+    col = 'lightblue',
+    main = 'Histograma das Alturas',
+    xlab = 'Altura',
+    ylab = 'Frequência'
+)
+
+# col = cor, main = título, xlab = legenda do eixo x, ylab = legenda do eixo y 
+
+library(ggplot2)
+library(ggthemes)
+
+ggplot(dados, aes(x = Altura)) + 
+           geom_histogram(binwidth = 0.02, color = "black", alpha = 0.9) + 
+           ylab("Frequência") + 
+           xlab("Alturas") + 
+           ggtitle('Histograma das Alturas') +
+           theme(
+               plot.title = element_text(size = 14, hjust = 0.5),
+               axis.title.y = element_text(size = 12, vjust = +0.2),
+               axis.title.x = element_text(size = 12, vjust = -0.2),
+               axis.text.y = element_text(size = 9),
+               axis.text.x = element_text(size = 9)
+           )
+
+# Atribuindo um nome a uma parte da função para não repeti-la mais durante o código:
+formatos <- theme(
+    plot.title = element_text(size = 14, hjust = 0.5),
+    axis.title.y = element_text(size = 12, vjust = +0.2),
+    axis.title.x = element_text(size = 12, vjust = -0.2),
+    axis.text.y = element_text(size = 9),
+    axis.text.x = element_text(size = 9)
+)
+
+ggplot(dados, aes(x = Altura, y = ..density..)) + 
+    geom_histogram(binwidth = 0.02, color = "black", alpha = 0.9) + 
+    geom_density(color = 'red') +
+    ylab("Frequência") + 
+    xlab("Alturas") + 
+    ggtitle('Histograma das Alturas') +
+    formatos
+
+# ..density.. = plotar a linha que descreve a função densidade de probabilidade.
+
+# Transformando a matriz com a distribuição de frequência da renda em data frame.
+# (Fazer isso é importante porque é melhor trabalhar com df no ggplot) 
+bar_chart <- data.frame(dist_freq_quantitativas_personalizadas)
+bar_chart
+
+ggplot(bar_chart, aes(x = row.names(bar_chart), y = bar_chart$Frequência)) + 
+    geom_bar(stat = "identity") + 
+    ylab("Frequência") + 
+    xlab("Classes de Renda") + 
+    ggtitle('Gráfico com as Classes de Renda') +
+    formatos
+
+
+# ------------------------------------------------------------------------------------------
+
+## MEDIDAS DE TENDÊNCIA CENTRAL
+
+# Notas de alunos para 6 matérias:
+materias <- c('Matemática', 'Português', 'Inglês', 'Geografia', 'História', 'Física', 'Química')
+Fulano <- c(8, 10, 4, 8, 6, 10, 8)
+Beltrano <- c(10, 2, 0.5, 1, 3, 9.5, 10)
+Sicrano <- c(7.5, 8, 7, 8, 8, 8.5, 7)
+
+# Criando um dataframe com as notas dos alunos:
+df <- data.frame(Fulano, Beltrano, Sicrano, row.names = materias)
+df
+
+# MÉDIA:
+(8 + 10 + 4 + 8 + 6 + 10 + 8)/7
+mean(df$Fulano)
+mean(dados$Renda)
+
+# Realizando a média de uma variável condicionada a outra:
+aggregate(list(Renda = dados$Renda), list(Sexo = dados$Sexo), mean) # A variável que será condição deve entrar como uma lista.
+
+# MEDIANA:
+# Forma Manual - n é ÍMPAR:
+
+df
+df_fulano <- df[order(df$Fulano), ]
+df_fulano
+
+# Obtendo o elemento mediano:
+n = nrow(df_fulano)
+n
+
+elemento_md <- (n+1)/2
+elemento_md
+
+df_fulano[elemento_md, ]
+
+# Com apenas uma função:
+median(df$Fulano)
+
+# Forma Manual - n é PAR:
+# Criando uma amostra aleatória fixa através do set.seed:
+set.seed(101)
+sample(nrow(df), 6)
+df_beltrano <- df[sample(nrow(df), 6),]
+df_beltrano
+
+n <- nrow(df_beltrano)
+n
+
+# Ordenando os dados:
+df_beltrano <- df_beltrano[order(df_beltrano$Beltrano),]
+df_beltrano
+
+elemento_md = n/2
+elemento_md
+
+mean(df_beltrano[c(elemento_md, elemento_md+1),]$Beltrano) # $Beltrano = selecionando dados apenas da coluna
+                                                           # Beltrano.
+
+median(df_beltrano$Beltrano)
+
+# Obtendo a mediana em nosso dataset:
+median(dados$Renda)

@@ -419,3 +419,235 @@ median(df_beltrano$Beltrano)
 
 # Obtendo a mediana em nosso dataset:
 median(dados$Renda)
+
+# MODA:
+df
+
+exemplo_moda <- c(1, 2, 2, 3, 4, 4, 5, 6, 7, 7)
+exemplo_moda
+
+freq <- table(exemplo_moda)
+freq
+
+freq[freq == max(freq)]
+
+names(freq)[freq == max(freq)]
+
+# Criar uma função:
+moda <- function(x) {
+    
+    freq <- table(x)
+    return(names(freq)[freq == max(freq)])
+    
+}
+
+moda(exemplo_moda)
+
+moda(df$Fulano)
+
+moda(df$Beltrano)
+
+moda(df$Sicrano)
+
+moda(dados$Renda)
+
+moda(dados$Altura)
+
+# RELAÇÃO ENTRE AS MEDIDAS DE TENDÊNCIA CENTRAL (MÉDIA, MEDIANA, MODA):
+
+# Assimetria à direita: Moda > Mediana > Média
+# Simétrica: Média = Mediana = Moda
+# Assimetria à esquerda: Média > Mediana > Moda
+
+# Avaliando a relação dessas medidas com a variável 'RENDA':
+ggplot(dados[dados$Renda < 20000, ], aes(x = Renda, y = ..density..)) + 
+    geom_histogram(binwidth = 500) + 
+    geom_density(color = 'green')
+
+moda_1 <- as.numeric(moda(dados$Renda)) # as.numeric = transformar números que estão como string em números.
+moda_1
+
+mediana <- median(dados$Renda)
+mediana
+
+media <- mean(dados$Renda)
+media
+
+# Comparativo:
+moda_1 < mediana
+mediana < media
+
+# Avaliando a relação dessas medidas com a variável 'ALTURA':
+ggplot(dados, aes(x = Altura, y = ..density..)) + 
+    geom_histogram() + 
+    geom_density(color = 'green')
+
+moda_2 <- as.numeric(moda(dados$Altura))
+moda_2
+
+mediana <- median(dados$Altura)
+mediana
+
+media <- mean(dados$Altura)
+media
+
+# Avaliando a relação dessas medidas com a variável 'ANOS DE ESTUDO':
+ggplot(dados, aes(x = Anos.de.Estudo, y = ..density..)) + 
+    geom_histogram() + 
+    geom_density(color = 'green')
+
+moda_3 <- as.numeric(moda(dados$Anos.de.Estudo))
+moda_3
+
+mediana <- median(dados$Anos.de.Estudo)
+mediana
+
+media = mean(dados$Anos.de.Estudo)
+media
+
+# Comparativo:
+moda_3 > mediana
+mediana > media
+
+# ------------------------------------------------------------------------------------------
+
+## MEDIDAS SEPARATRIZES:
+# Quartis:
+quantile(dados$Renda, c(0.25, 0.5, 0.75))
+
+decis <- c()
+for(i in 1:9){
+    decis <- c(decis, i/10)
+}
+decis
+
+quantile(dados$Renda, decis)
+
+centis <- c()
+for(i in 1:99){
+    centis <- c(centis, i/100)
+}
+quantile(dados$Renda, centis)
+
+# Gráfico da frequência acumulada da Idade:
+ggplot(data = dados, aes(x = Idade)) + 
+    geom_histogram(
+        aes(y = cumsum(..count..)/sum(..count..)), 
+        bins = 10
+    ) + 
+    geom_freqpoly(
+        aes(y = cumsum(..count..)/sum(..count..)), 
+        color = 'green'
+    )
+
+decis <- c()
+for(i in 1:9){
+    decis <- c(decis, i/10)
+}
+quantile(dados$Idade, decis)
+
+length(dados$Idade[dados$Idade <=40]) / length(dados$Idade) * 100
+
+# BOXPLOT:
+
+sexo = c(
+    'Masculino', 
+    'Feminino'
+)
+cor = c(
+    'Indígena', 
+    'Branca', 
+    'Preta', 
+    'Amarela', 
+    'Parda'
+)
+anos_de_estudo = c(
+    'Sem instrução e menos de 1 ano', 
+    '1 ano', 
+    '2 anos', 
+    '3 anos', 
+    '4 anos', 
+    '5 anos', 
+    '6 anos', 
+    '7 anos', 
+    '8 anos', 
+    '9 anos', 
+    '10 anos', 
+    '11 anos', 
+    '12 anos', 
+    '13 anos', 
+    '14 anos', 
+    '15 anos ou mais', 
+    'Não determinados'
+)
+
+ggplot(data = dados, aes(x = " ", y = Altura)) + 
+    stat_boxplot(geom ='errorbar', width = 0.4) + 
+    geom_boxplot(fill = '#3274A1') + 
+    coord_flip() +
+    ylab("Metros") + 
+    xlab("") + 
+    ggtitle('Box-plot: Alturas') +
+    formatos
+
+ggplot(data = dados, aes(x = Sexo, y = Altura, group = Sexo)) + 
+    stat_boxplot(geom ='errorbar', width = 0.4) + 
+    geom_boxplot(fill = c('#3274A1', "orange")) + 
+    coord_flip() +
+    ylab("Metros") + 
+    xlab("Sexo") + 
+    ggtitle('Box-plot: Alturas vs. Sexo') +
+    formatos
+
+# Transformando variável 'SEXO' em uma variável categórica não numérica:
+dados$Cat.Sexo <- factor(dados$Sexo)
+levels(dados$Cat.Sexo) <- sexo
+
+ggplot(data = dados, aes(x = Cat.Sexo, y = Altura)) + 
+    stat_boxplot(geom ='errorbar', width = 0.4) + 
+    geom_boxplot(fill = c('#3274A1', "orange")) + 
+    coord_flip() +
+    ylab("Metros") + 
+    xlab("Sexo") + 
+    ggtitle('Box-plot: Alturas vs. Sexo') +
+    formatos
+
+ggplot(data = dados[dados$Renda < 10000, ], aes(x = " ", y = Renda)) + 
+    stat_boxplot(geom ='errorbar', width = 0.4) + 
+    geom_boxplot(fill = '#3274A1') + 
+    coord_flip() +
+    ylab("R$") + 
+    xlab("") + 
+    ggtitle('Box-plot: Renda') +
+    formatos
+
+ggplot(data = dados[dados$Renda < 10000, ], aes(x = Cat.Sexo, y = Renda)) + 
+    stat_boxplot(geom ='errorbar', width = 0.4) + 
+    geom_boxplot(fill = c('#3274A1', "orange")) + 
+    coord_flip() +
+    ylab("R$") + 
+    xlab("Sexo") + 
+    ggtitle('Box-plot: Renda vs. Sexo') +
+    formatos
+
+# Transformando variável 'SEXO' em uma variável categórica não numérica:
+dados$Cat.Anos.de>Estudo <- factor(dados$Anos.de.Estudo, order=True) # order = dizendo pro R que essa variável
+levels(dados$Cat.Anos.de.Estudo) <- anos_de_estudo                   # pode ser ordenada.
+
+ggplot(data = dados, aes(x = " ", y = Anos.de.Estudo)) + 
+    stat_boxplot(geom ='errorbar', width = 0.4) + 
+    geom_boxplot(fill = '#3274A1') + 
+    coord_flip() +
+    ylab("Anos") + 
+    xlab("") + 
+    ggtitle('Box-plot: Anos de Estudo') +
+    formatos
+
+ggplot(data = dados, aes(x = Cat.Sexo, y = Anos.de.Estudo)) + 
+    stat_boxplot(geom ='errorbar', width = 0.4) + 
+    geom_boxplot(fill = c('#3274A1', "orange")) + 
+    coord_flip() +
+    ylab("Anos") + 
+    xlab("Sexo") + 
+    ggtitle('Box-plot: Anos de Estudo vs. Sexo') +
+    formatos

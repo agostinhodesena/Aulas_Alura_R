@@ -651,3 +651,68 @@ ggplot(data = dados, aes(x = Cat.Sexo, y = Anos.de.Estudo)) +
     xlab("Sexo") + 
     ggtitle('Box-plot: Anos de Estudo vs. Sexo') +
     formatos
+
+# ------------------------------------------------------------------------------------------
+
+## MEDIDAS DE DISPERSÃO:
+# DESVIO MÉDIO ABSOLUTO
+
+df
+summary(df)
+
+notas_fulano <- data.frame(Fulano = df$Fulano, row.names(df))
+notas_fulano
+
+nota_media_fulano <- mean(notas_fulano$Fulano)
+nota_media_fulano
+
+notas_fulano$Desvio <- notas_fulano$Fulano - nota_media_fulano
+notas_fulano
+
+notas_fulano$Desvio.Absoluto <- abs(notas_fulano$Desvio)
+notas_fulano
+
+ggplot(data = notas_fulano, aes(x = row.names(notas_fulano), y = Fulano)) + 
+    geom_point() + 
+    geom_hline(yintercept = mean(notas_fulano$Fulano), color = 'red') + 
+    geom_segment(aes(x = 1, y = 10, xend = 1, yend = mean(notas_fulano$Fulano))) + 
+    geom_segment(aes(x = 2, y = 8, xend = 2, yend = mean(notas_fulano$Fulano))) + 
+    geom_segment(aes(x = 3, y = 6, xend = 3, yend = mean(notas_fulano$Fulano))) + 
+    geom_segment(aes(x = 4, y = 4, xend = 4, yend = mean(notas_fulano$Fulano))) + 
+    geom_segment(aes(x = 5, y = 8, xend = 5, yend = mean(notas_fulano$Fulano))) + 
+    geom_segment(aes(x = 6, y = 10, xend = 6, yend = mean(notas_fulano$Fulano))) + 
+    geom_segment(aes(x = 7, y = 8, xend = 7, yend = mean(notas_fulano$Fulano)))
+
+mean(notas_fulano$Desvio.Absoluto)
+
+# VARIÂNCIA:
+
+notas_fulano$Desvio2 <- notas_fulano$Desvio ^ 2
+notas_fulano
+
+sum(notas_fulano$Desvio2) / (nrow(notas_fulano) - 1)
+
+variancia <- var(notas_fulano$Fulano)
+variancia
+
+# DESVIO-PADRÃO:
+
+sqrt(variancia)
+
+desvio_padrao <- sd(notas_fulano$Fulano)
+desvio_padrao
+
+summary(df)
+
+sd(df$Fulano)
+sd(df$Sicrano)
+
+# ATIVIDADE
+dataset <- data.frame( 
+    Sexo = c('H', 'M', 'M', 'M', 'M', 'H', 'H', 'H', 'M', 'M'), 
+    Idade = c(53, 72, 54, 27, 30, 40, 58, 32, 44, 51) 
+) 
+
+dataset
+sd(dataset$Idade)
+sd(dataset$Idade[dataset$Sexo == 'M'])

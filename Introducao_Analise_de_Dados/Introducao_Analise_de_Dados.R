@@ -1,5 +1,5 @@
-################# Regressão Linear Simples em R: correlação e previsão
-################# Profa. Alia Garrudo Guirado
+################# Análise de dados: introdução com R
+################# Prof. Rodolpho Bernabel
 
 # ----------------------------------------------------------------------------------------------------------------
 
